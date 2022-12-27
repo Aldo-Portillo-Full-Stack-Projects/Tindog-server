@@ -18,6 +18,14 @@ const dogSchema = mongoose.Schema({
         type: String,
         required: [true, "Please enter description"]
     },
+    hasBeenSwiped: {
+        type: Boolean,
+        default: false
+    },
+    hasBeenLiked: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const Dog = mongoose.model("Dog", dogSchema);
