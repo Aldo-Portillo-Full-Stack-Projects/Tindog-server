@@ -24,3 +24,8 @@ const createDog = asyncHandler(async (req,res) => {
 
     res.status(201).json(dog)
 })
+
+module.exports = {
+    getDogs,
+    createDog
+}
