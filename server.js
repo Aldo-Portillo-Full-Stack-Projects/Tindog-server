@@ -5,6 +5,7 @@ const cors = require("cors")
 const dogRoutes = require("./routes/dogRoutes")
 const userRoutes = require("./routes/userRoutes")
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 
 const app = express()
 
@@ -23,8 +24,14 @@ mongoose
 app.use(express.json());
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
+app.use(bodyParser.json())
 
-app.use(cors())
+const corsOptions ={
+    origin:'http://localhost:3000', 
+    credentials:true,
+    optionSuccessStatus:200
+}
+app.use(cors(corsOptions))
 
 app.use(dogRoutes)
 app.use(userRoutes)
