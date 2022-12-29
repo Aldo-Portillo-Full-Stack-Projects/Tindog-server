@@ -21,6 +21,9 @@ const userSchema = mongoose.Schema({
         required: [true, "Please add a password"],
         minLength: [6, "Password must be more than 6 characters"],
     },
+    likedDogs: {
+        type: [Object]
+    }
 }, {
     timestamps: true,
 })
