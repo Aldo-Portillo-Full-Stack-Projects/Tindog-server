@@ -3,6 +3,8 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const dogRoutes = require("./routes/dogRoutes")
+const userRoutes = require("./routes/userRoutes")
+const cookieParser = require("cookie-parser");
 
 const app = express()
 
@@ -19,12 +21,13 @@ mongoose
     .catch((err) => console.log(err))
 
 app.use(express.json());
-
+app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
 
 app.use(cors())
 
 app.use(dogRoutes)
+app.use(userRoutes)
 
 app.get("/", (req, res) => {
     res.send("<h1>Tindog Server -- Please Leave</h1>")
