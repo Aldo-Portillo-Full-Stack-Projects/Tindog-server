@@ -152,7 +152,7 @@ const loginStatus = asyncHandler( async (req, res) => {
 
 const addDog = asyncHandler(async (req, res) => {
     
-    User.updateOne({_id: req.user.id}, { $push: { likedDogs: req.body.newDog } }, (err, result) => {
+    User.updateOne({_id: req.user.id}, { $push: { likedDogs: req.body } }, (err, result) => {
         if (err) {
             res.send(err);
           } else {
