@@ -10,6 +10,7 @@ const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: "1d"})
 }
 
+
 //Register user
 const registerUser = asyncHandler( async (req, res) => {
     const {name, email, password} = req.body
@@ -47,8 +48,8 @@ const registerUser = asyncHandler( async (req, res) => {
         path: "/",
         httpOnly: true,
         expires: new Date(Date.now() + 1000 * 86400),
-        sameSite: "none", //Only used in deployment allows it to work on deployment
-        secure: true, //Only used in deployment
+        //sameSite: "none", //Only used in deployment allows it to work on deployment
+        //secure: true, //Only used in deployment
     })
 
     if(user) {
@@ -61,7 +62,6 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new Error("Invalid user data")
     }
 })
-
 //Login user
 const loginUser = asyncHandler( async (req, res) => {
     const {email, password } = req.body;
@@ -93,11 +93,11 @@ const loginUser = asyncHandler( async (req, res) => {
         expires: new Date(Date.now() + 1000 * 86400),
         sameSite: "none", //Only used in deployment allows it to work on deployment
         secure: true, //Only used in deployment
-    })
+    },console.log("cookie sent"))
 
     //Get user info if validated
     if (user && passwordIsCorrect) {
-        const { _id, name, email,  }  = user
+        const { _id, name, email }  = user
         res.status(200).json({
             _id, name, email, token
         })
@@ -107,14 +107,15 @@ const loginUser = asyncHandler( async (req, res) => {
     }
 })
 
+
 //Logout User
 const logout = asyncHandler( async (req, res) => {
     res.cookie("token", "", { //MOdify cookie to expire it
         path: "/",
         httpOnly: true,
         expires: new Date(0),
-        sameSite: "none", //Only used in deployment allows it to work on deployment
-        secure: true, //Only used in deployment
+        //sameSite: "none", //Only used in deployment allows it to work on deployment
+        //secure: true, //Only used in deployment
     })
     return res.status(200).json({ message: "Logged out Successfully"})
 })
@@ -138,6 +139,8 @@ const getUser = asyncHandler(async (req, res) => {
 const loginStatus = asyncHandler( async (req, res) => {
 
     const token = req.cookies.token;
+    console.log(req.cookies.token);
+    
 
     if(!token) {
         return res.json(false)
@@ -148,7 +151,7 @@ const loginStatus = asyncHandler( async (req, res) => {
     if(verified) {
         return res.json(true)
     }
-
+    
     return res.json(false)
 })
 
