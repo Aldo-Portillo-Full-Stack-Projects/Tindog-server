@@ -122,9 +122,9 @@ const getUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)
 
     if(user) {
-        const { _id, name, email, photo, phone, bio }  = user
+        const { _id, name, email, likedDogs }  = user
         res.status(201).json({
-            _id, name, email, photo, phone, bio,
+            _id, name, email, likedDogs,
         })
     } else {
         res.status(400)
@@ -150,31 +150,15 @@ const loginStatus = asyncHandler( async (req, res) => {
     return res.json(false)
 })
 
-const updateUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id)
-
-    if(user) {
-        const { name, email, photo, phone, bio }  = user
-
-        user.email = email;
-        user.name = req.body.name || name;
-        user.phone = req.body.phone || phone;
-        user.bio = req.body.bio || bio;
-        user.photo = req.body.photo || photo;
-
-        const updateUser = await user.save()
-        res.status(200).json({
-            _id:updateUser._id, 
-            name:updateUser.name, 
-            email:updateUser.email, 
-            photo:updateUser.photo, 
-            phone:updateUser.phone, 
-            bio:updateUser.bio,
-        })
-    } else {
-        res.status(404)
-        throw new Error("User not found")
-    }
+const addDog = asyncHandler(async (req, res) => {
+    
+    User.updateOne({_id: req.user.id}, { $push: { likedDogs: req.body.newDog } }, (err, result) => {
+        if (err) {
+            res.send(err);
+          } else {
+            res.send(result);
+          }
+    })
 })
 
 module.exports = {
@@ -183,4 +167,5 @@ module.exports = {
     logout,
     getUser,
     loginStatus,
+    addDog
 }
