@@ -50,9 +50,9 @@ const registerUser = asyncHandler( async (req, res) => {
     })
 
     if(user) {
-        const { _id, name, email, photo, phone, bio }  = user
+        const { _id, name, email, likedDogs }  = user
         res.status(201).json({
-            _id, name, email, photo, phone, bio, token,
+            _id, name, email, likedDogs, token,
         })
     } else {
         res.status(400)
@@ -95,9 +95,9 @@ const loginUser = asyncHandler( async (req, res) => {
 
     //Get user info if validated
     if (user && passwordIsCorrect) {
-        const { _id, name, email, photo, phone, bio }  = user
+        const { _id, email, likedDogs  }  = user
         res.status(200).json({
-            _id, name, email, photo, phone, bio, token
+            _id, email, token, likedDogs
         })
     } else {
         res.status(400)
