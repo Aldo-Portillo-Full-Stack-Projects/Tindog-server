@@ -2,14 +2,11 @@ const asyncHandler = require("express-async-handler")
 const User = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
-const Token = require("../models/tokenModel")
-const crypto = require("crypto")
 
 //Create JSON web token using user id and a secret string to encrypt and add expiration
 const generateToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: "1d"})
 }
-
 
 //Register user
 const registerUser = asyncHandler( async (req, res) => {
@@ -48,20 +45,21 @@ const registerUser = asyncHandler( async (req, res) => {
         path: "/",
         httpOnly: true,
         expires: new Date(Date.now() + 1000 * 86400),
-        //sameSite: "none", //Only used in deployment allows it to work on deployment
-        //secure: true, //Only used in deployment
+        sameSite: "none", //Only used in deployment allows it to work on deployment
+        secure: true, //Only used in deployment
     })
 
     if(user) {
-        const { _id, name, email,  }  = user
+        const { _id, name, email, photo, phone, bio }  = user
         res.status(201).json({
-            _id, name, email, token,
+            _id, name, email, photo, phone, bio, token,
         })
     } else {
         res.status(400)
         throw new Error("Invalid user data")
     }
 })
+
 //Login user
 const loginUser = asyncHandler( async (req, res) => {
     const {email, password } = req.body;
@@ -93,13 +91,13 @@ const loginUser = asyncHandler( async (req, res) => {
         expires: new Date(Date.now() + 1000 * 86400),
         sameSite: "none", //Only used in deployment allows it to work on deployment
         secure: true, //Only used in deployment
-    },console.log("cookie sent"))
+    })
 
     //Get user info if validated
     if (user && passwordIsCorrect) {
-        const { _id, name, email }  = user
+        const { _id, name, email, photo, phone, bio }  = user
         res.status(200).json({
-            _id, name, email, token
+            _id, name, email, photo, phone, bio, token
         })
     } else {
         res.status(400)
@@ -107,15 +105,14 @@ const loginUser = asyncHandler( async (req, res) => {
     }
 })
 
-
 //Logout User
 const logout = asyncHandler( async (req, res) => {
     res.cookie("token", "", { //MOdify cookie to expire it
         path: "/",
         httpOnly: true,
         expires: new Date(0),
-        //sameSite: "none", //Only used in deployment allows it to work on deployment
-        //secure: true, //Only used in deployment
+        sameSite: "none", //Only used in deployment allows it to work on deployment
+        secure: true, //Only used in deployment
     })
     return res.status(200).json({ message: "Logged out Successfully"})
 })
@@ -125,9 +122,9 @@ const getUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)
 
     if(user) {
-        const { _id, name, email,}  = user
+        const { _id, name, email, photo, phone, bio }  = user
         res.status(201).json({
-            _id, name, email,
+            _id, name, email, photo, phone, bio,
         })
     } else {
         res.status(400)
@@ -139,8 +136,6 @@ const getUser = asyncHandler(async (req, res) => {
 const loginStatus = asyncHandler( async (req, res) => {
 
     const token = req.cookies.token;
-    console.log(req.cookies.token);
-    
 
     if(!token) {
         return res.json(false)
@@ -151,10 +146,36 @@ const loginStatus = asyncHandler( async (req, res) => {
     if(verified) {
         return res.json(true)
     }
-    
+
     return res.json(false)
 })
 
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id)
+
+    if(user) {
+        const { name, email, photo, phone, bio }  = user
+
+        user.email = email;
+        user.name = req.body.name || name;
+        user.phone = req.body.phone || phone;
+        user.bio = req.body.bio || bio;
+        user.photo = req.body.photo || photo;
+
+        const updateUser = await user.save()
+        res.status(200).json({
+            _id:updateUser._id, 
+            name:updateUser.name, 
+            email:updateUser.email, 
+            photo:updateUser.photo, 
+            phone:updateUser.phone, 
+            bio:updateUser.bio,
+        })
+    } else {
+        res.status(404)
+        throw new Error("User not found")
+    }
+})
 
 module.exports = {
     registerUser,
